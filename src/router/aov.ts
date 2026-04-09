@@ -3,6 +3,9 @@ import { hitCoda, Result } from '../utils'
 export default async function aov(id: number): Promise<Result> {
   const body = `user.userId=${id}&voucherPricePoint.id=7946&voucherPricePoint.price=10000&shopLang=id_ID&voucherTypeName=AOV`
   const data = await hitCoda(body)
+  if (!data?.confirmationFields?.roles?.[0]) {
+    return { success: false, message: 'Not found' }
+  }
   return {
     success: true,
     game: 'Garena: AOV (Arena Of Valor)',

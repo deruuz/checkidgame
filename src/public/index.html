@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nickname Validator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f0f0f; color: #e0e0e0; min-height: 100vh; padding: 32px 16px; }
+    h1 { text-align: center; font-size: 1.6rem; margin-bottom: 8px; color: #fff; }
+    p.sub { text-align: center; color: #888; margin-bottom: 32px; font-size: 0.9rem; }
+    .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; max-width: 520px; margin: 0 auto; }
+    label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 6px; margin-top: 16px; }
+    label:first-of-type { margin-top: 0; }
+    select, input { width: 100%; padding: 10px 12px; background: #111; border: 1px solid #333; border-radius: 8px; color: #e0e0e0; font-size: 0.95rem; outline: none; }
+    select:focus, input:focus { border-color: #555; }
+    button { margin-top: 20px; width: 100%; padding: 12px; background: #2563eb; border: none; border-radius: 8px; color: #fff; font-size: 1rem; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #333; cursor: not-allowed; }
+    .result { margin-top: 20px; background: #111; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; display: none; }
+    .result.show { display: block; }
+    .result.success { border-color: #16a34a44; }
+    .result.error { border-color: #dc262644; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; margin-bottom: 12px; }
+    .badge.ok { background: #16a34a33; color: #4ade80; }
+    .badge.fail { background: #dc262633; color: #f87171; }
+    .name { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .meta { font-size: 0.82rem; color: #666; }
+    .meta span { color: #999; }
+    .extra-fields { display: none; }
+    .extra-fields.show { display: block; }
+    pre { font-size: 0.8rem; color: #aaa; white-space: pre-wrap; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <h1>Nickname Validator</h1>
+  <p class="sub">Cek nickname in-game berdasarkan Player ID</p>
+
+  <div class="card">
+    <label>Game</label>
+    <select id="game" onchange="onGameChange()">
+      <option value="zzz">Zenless Zone Zero</option>
+      <option value="gi">Genshin Impact</option>
+      <option value="hsr">Honkai: Star Rail</option>
+      <option value="hi">Honkai Impact 3rd</option>
+      <option value="ml">Mobile Legends: Bang Bang</option>
+      <option value="ff">Free Fire</option>
+      <option value="aov">Arena of Valor</option>
+      <option value="codm">Call of Duty Mobile</option>
+      <option value="valo">Valorant</option>
+      <option value="pb">Point Blank</option>
+      <option value="pgr">Punishing: Gray Raven</option>
+      <option value="la">LifeAfter</option>
+      <option value="ld">Love and Deepspace</option>
+      <option value="mcgg">Magic Chess: Go Go</option>
+      <option value="sm">Sausage Man</option>
+      <option value="sus">Super Sus</option>
+    </select>
+
+    <label>Player ID</label>
+    <input type="text" id="playerid" placeholder="Masukkan Player ID" />
+
+    <div class="extra-fields" id="field-server">
+      <label id="server-label">Server / Zone ID</label>
+      <input type="text" id="server" placeholder="" />
+    </div>
+
+    <div class="extra-fields" id="field-pgr-server">
+      <label>Server</label>
+      <select id="pgr-server">
+        <option value="AP">Asia-Pacific (AP)</option>
+        <option value="EU">Europe (EU)</option>
+        <option value="NA">North America (NA)</option>
+      </select>
+    </div>
+
+    <button id="btn" onclick="checkNickname()">Cek Nickname</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const gamesWithServer = ['ml', 'mcgg']
+    const gamesWithZone = ['la']
+    const serverHints = {
+      ml: 'Zone ID (contoh: 13486)',
+      mcgg: 'Zone ID (contoh: 1001)',
+      la: 'Nama server (contoh: milestone)',
+    }
+
+    function onGameChange() {
+      const game = document.getElementById('game').value
+      const fieldServer = document.getElementById('field-server')
+      const fieldPgr = document.getElementById('field-pgr-server')
+      const serverLabel = document.getElementById('server-label')
+      const serverInput = document.getElementById('server')
+
+      fieldServer.classList.remove('show')
+      fieldPgr.classList.remove('show')
+
+      if (gamesWithServer.includes(game) || gamesWithZone.includes(game)) {
+        fieldServer.classList.add('show')
+        serverLabel.textContent = game === 'la' ? 'Nama Server' : 'Zone ID'
+        serverInput.placeholder = serverHints[game] || ''
+      } else if (game === 'pgr') {
+        fieldPgr.classList.add('show')
+      }
+
+      document.getElementById('result').classList.remove('show')
+    }
+
+    async function checkNickname() {
+      const game = document.getElementById('game').value
+      const id = document.getElementById('playerid').value.trim()
+      const server = document.getElementById('server').value.trim()
+      const pgrServer = document.getElementById('pgr-server').value
+      const btn = document.getElementById('btn')
+      const resultEl = document.getElementById('result')
+
+      if (!id) {
+        alert('Player ID tidak boleh kosong')
+        return
+      }
+
+      btn.disabled = true
+      btn.textContent = 'Mengecek...'
+      resultEl.classList.remove('show', 'success', 'error')
+
+      let url = `/${game}?id=${encodeURIComponent(id)}`
+      if ((gamesWithServer.includes(game) || gamesWithZone.includes(game)) && server) {
+        url += `&server=${encodeURIComponent(server)}`
+      } else if (game === 'pgr') {
+        url += `&server=${pgrServer}`
+      }
+
+      try {
+        const res = await fetch(url)
+        const data = await res.json()
+
+        if (data.success) {
+          resultEl.innerHTML = `
+            <span class="badge ok">✓ Ditemukan</span>
+            <div class="name">${data.name || '-'}</div>
+            <div class="meta">
+              <span>${data.game}</span>
+              ${data.server ? ` &nbsp;·&nbsp; <span>${data.server}</span>` : ''}
+              ${data.country ? ` &nbsp;·&nbsp; <span>${data.country}</span>` : ''}
+              &nbsp;·&nbsp; ID: <span>${data.id}</span>
+            </div>
+          `
+          resultEl.classList.add('show', 'success')
+        } else {
+          resultEl.innerHTML = `
+            <span class="badge fail">✗ Gagal</span>
+            <pre>${JSON.stringify(data, null, 2)}</pre>
+          `
+          resultEl.classList.add('show', 'error')
+        }
+      } catch (e) {
+        resultEl.innerHTML = `<span class="badge fail">✗ Error</span><pre>${e.message}</pre>`
+        resultEl.classList.add('show', 'error')
+      }
+
+      btn.disabled = false
+      btn.textContent = 'Cek Nickname'
+    }
+
+    document.getElementById('playerid').addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkNickname()
+    })
+  </script>
+</body>
+</html>

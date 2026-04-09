@@ -24,6 +24,9 @@ export default async function pgr(id: number, zone: string): Promise<Result> {
   }
   const body = `voucherPricePoint.id=259947&voucherPricePoint.price=15000&voucherPricePoint.variablePrice=0&user.userId=${id}&user.zoneId=${sv}&voucherTypeName=PUNISHING_GRAY_RAVEN&shopLang=id_ID`
   const data = await hitCoda(body)
+  if (!data?.confirmationFields?.username) {
+    return { success: false, message: 'Not found' }
+  }
   return {
     success: true,
     game: 'Punishing: Gray Raven',

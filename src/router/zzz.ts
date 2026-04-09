@@ -29,6 +29,9 @@ export default async function zzz(id: number): Promise<Result> {
   }
   const body = `voucherPricePoint.id=946399&voucherPricePoint.price=16000&voucherPricePoint.variablePrice=0&user.userId=${id}&user.zoneId=${sv}&voucherTypeName=ZENLESS_ZONE_ZERO&shopLang=id_ID`
   const data = await hitCoda(body)
+  if (!data?.confirmationFields?.username) {
+    return { success: false, message: 'Not found' }
+  }
   return {
     success: true,
     game: 'Zenless Zone Zero',

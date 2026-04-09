@@ -8,7 +8,7 @@ Endpoint ini di deploy di Vercel dengan WAF standar
 Meringirim banyak request dalam waktu singkat dapat menyebabkan WAF aktif
 */
   const request = await fetch(`https://mlbb-api.isan.eu.org/find?id=${id}&zone=${zone}`)
-  const data = await request.json()
+  const data = await request.json() as any
   return {
     success: true,
     game: 'Mobile Legends: Bang Bang',

@@ -8,7 +8,7 @@ export default async function mcgg(id: number, zone: number): Promise<Result> {
       success: true,
       game: 'Magic Chess: Go Go',
       id,
-      zone,
+      server: zone,
       name: data.confirmationFields.username
     }
   } else {

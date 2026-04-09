@@ -1,6 +1,6 @@
 import { hitCoda, Result } from '../utils'
 
-export default async function valo(id: number): Promise<Result> {
+export default async function valo(id: string): Promise<Result> {
   const body = `voucherPricePoint.id=973634&voucherPricePoint.price=56000&voucherPricePoint.variablePrice=0&user.userId=${id}&voucherTypeName=VALORANT&voucherTypeId=109&gvtId=139&shopLang=id_ID`
   const data = await hitCoda(body)
   if (data.success === true) {
@@ -16,7 +16,7 @@ export default async function valo(id: number): Promise<Result> {
       success: true,
       game: 'VALORANT',
       id,
-      name: id
+      name: String(id)
     }
   } else {
     return {
